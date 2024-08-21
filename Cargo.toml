@@ -1,0 +1,3 @@
+[workspace]
+members = ["common", "cli", "gui"]
+resolver = "2"
