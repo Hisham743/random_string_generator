@@ -29,9 +29,10 @@ impl Distribution<char> for RandomStringGenerator {
             .into_iter()
             .filter(|character| {
                 !character.is_whitespace()
+                    && !character.is_ascii_control()
                     && (self.include_numbers || !character.is_numeric())
                     && (self.include_uppercase || !character.is_ascii_uppercase())
-                    && (self.include_special_chars || character.is_alphanumeric())
+                    && (self.include_special_chars || character.is_ascii_alphanumeric())
             })
             .collect::<Vec<char>>();
 
