@@ -5,7 +5,6 @@ use std::{char, error::Error};
 pub struct RandomStringGenerator {
     pub count: u32,
     pub length: u32,
-    pub include_control_chars: bool,
     pub include_special_chars: bool,
     pub include_numbers: bool,
     pub include_uppercase: bool,
@@ -16,7 +15,6 @@ impl Default for RandomStringGenerator {
         RandomStringGenerator {
             count: 5,
             length: 32,
-            include_control_chars: false,
             include_numbers: true,
             include_special_chars: true,
             include_uppercase: true,
@@ -31,7 +29,7 @@ impl Distribution<char> for RandomStringGenerator {
             .into_iter()
             .filter(|character| {
                 !character.is_whitespace()
-                    && (self.include_control_chars || !character.is_control())
+                    && !character.is_control()
                     && (self.include_numbers || !character.is_numeric())
                     && (self.include_uppercase || !character.is_uppercase())
                     && (self.include_special_chars || character.is_alphanumeric())
@@ -83,7 +81,6 @@ mod tests {
             RandomStringGenerator {
                 count: 5,
                 length: 32,
-                include_control_chars: false,
                 include_numbers: true,
                 include_special_chars: true,
                 include_uppercase: true
@@ -142,27 +139,6 @@ mod tests {
         string_generator.length = 100;
 
         (string_generator.generate().unwrap(), string_generator)
-    }
-
-    #[test]
-    fn control_chars() {
-        let (mut strings, mut string_generator) = setup();
-
-        assert_eq!(
-            true,
-            strings
-                .iter()
-                .all(|string| string.chars().all(|char| !char.is_control()))
-        );
-
-        string_generator.include_control_chars = true;
-        strings = string_generator.generate().unwrap();
-        assert_eq!(
-            true,
-            strings
-                .iter()
-                .all(|string| string.chars().any(|char| char.is_control()))
-        );
     }
 
     #[test]

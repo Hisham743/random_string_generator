@@ -23,10 +23,6 @@ struct Cli {
     /// Exclude uppercase letters from the generated strings
     #[arg(long)]
     exclude_uppercase: bool,
-
-    /// Includes ASCII control charecters in the generated strings
-    #[arg(long)]
-    include_control_chars: bool,
 }
 
 fn main() {
@@ -44,7 +40,6 @@ fn main() {
     string_generator.include_special_chars = !args.exclude_special_chars;
     string_generator.include_numbers = !args.exclude_numbers;
     string_generator.include_uppercase = !args.exclude_uppercase;
-    string_generator.include_control_chars = args.include_control_chars;
 
     let strings = match string_generator.generate() {
         Ok(val) => val,
