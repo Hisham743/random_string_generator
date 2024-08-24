@@ -1,7 +1,7 @@
 use rand::{self, distributions::Distribution, seq::SliceRandom, Rng};
 use std::{char, error::Error};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct RandomStringGenerator {
     pub count: u32,
     pub length: u32,
