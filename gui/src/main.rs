@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use common::RandomStringGenerator;
 use eframe::{self, egui, egui_wgpu::WgpuConfiguration, wgpu::Backends};
 use std::error::Error;
