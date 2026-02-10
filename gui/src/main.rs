@@ -1,8 +1,7 @@
 #![windows_subsystem = "windows"]
 
 use common::RandomStringGenerator;
-use eframe::{self, egui, egui_wgpu::WgpuConfiguration, wgpu::Backends};
-use std::error::Error;
+use eframe::egui;
 
 const ICON_IMAGE: &[u8] = include_bytes!("icon.png");
 
@@ -14,7 +13,9 @@ fn main() -> eframe::Result {
 
     let app = MyApp {
         string_generator,
-        generated_strings: string_generator.generate(),
+        generated_strings: string_generator
+            .generate()
+            .expect("Default count and length should be valid"),
     };
 
     let viewport = egui::ViewportBuilder::default()
@@ -24,12 +25,7 @@ fn main() -> eframe::Result {
         .with_icon((eframe::icon_data::from_png_bytes(ICON_IMAGE)).unwrap());
 
     let options = eframe::NativeOptions {
-        renderer: eframe::Renderer::Wgpu,
         viewport,
-        wgpu_options: WgpuConfiguration {
-            supported_backends: Backends::DX12,
-            ..Default::default()
-        },
         ..Default::default()
     };
 
@@ -42,7 +38,7 @@ fn main() -> eframe::Result {
 
 struct MyApp {
     string_generator: RandomStringGenerator,
-    generated_strings: Result<Vec<String>, Box<dyn Error>>,
+    generated_strings: Vec<String>,
 }
 
 impl eframe::App for MyApp {
@@ -122,7 +118,10 @@ impl eframe::App for MyApp {
                     )
                     .clicked()
                 {
-                    self.generated_strings = self.string_generator.generate()
+                    self.generated_strings = self
+                        .string_generator
+                        .generate()
+                        .expect("Count and length should be validated")
                 };
             });
 
@@ -130,33 +129,24 @@ impl eframe::App for MyApp {
             ui.vertical_centered(|ui| ui.heading("Output"));
             ui.add_space(10.0);
 
-            match &self.generated_strings {
-                Ok(strings) => {
-                    egui::ScrollArea::vertical().auto_shrink(false).show_rows(
-                        ui,
-                        ui.text_style_height(&egui::TextStyle::Body),
-                        strings.len(),
-                        |ui, _row_range| {
-                            for string in strings {
-                                ui.horizontal(|ui| {
-                                    if ui.button("📋").on_hover_text("Copy to clipboard").clicked()
-                                    {
-                                        ui.output_mut(|o| o.copied_text = string.clone());
-                                    }
-
-                                    ui.add(egui::Label::new(string).wrap());
-                                });
-
-                                ui.add_space(5.0);
+            egui::ScrollArea::vertical().auto_shrink(false).show_rows(
+                ui,
+                ui.text_style_height(&egui::TextStyle::Body),
+                self.generated_strings.len(),
+                |ui, _row_range| {
+                    for string in &self.generated_strings {
+                        ui.horizontal(|ui| {
+                            if ui.button("📋").on_hover_text("Copy to clipboard").clicked() {
+                                ui.output_mut(|o| o.copied_text = string.clone());
                             }
-                        },
-                    );
-                }
 
-                Err(err) => {
-                    ui.label(format!("Error: {}", err));
-                }
-            }
+                            ui.add(egui::Label::new(string).wrap());
+                        });
+
+                        ui.add_space(5.0);
+                    }
+                },
+            );
         });
     }
 }

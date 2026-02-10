@@ -1,5 +1,5 @@
 use rand::{self, distributions::Distribution, seq::SliceRandom, Rng};
-use std::{char, error::Error};
+use std::char;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct RandomStringGenerator {
@@ -45,13 +45,13 @@ impl RandomStringGenerator {
         Self::default()
     }
 
-    pub fn generate(&self) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn generate(&self) -> Result<Vec<String>, &'static str> {
         if let 0 = self.count {
-            return Err("Number of strings cannot be 0".into());
+            return Err("Number of strings cannot be 0");
         }
 
         if let 0 = self.length {
-            return Err("Length of the string cannot be 0".into());
+            return Err("Length of the string cannot be 0");
         }
 
         let mut rng = rand::thread_rng();
@@ -59,7 +59,7 @@ impl RandomStringGenerator {
         for _ in 0..self.count {
             let string = self
                 .sample_iter(&mut rng)
-                .take(self.length.try_into()?)
+                .take(self.length as usize)
                 .map(char::from)
                 .collect();
 
